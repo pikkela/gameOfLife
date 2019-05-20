@@ -40,6 +40,7 @@
 #include <time.h>
 #include <stdlib.h>
 #include<Windows.h>
+#include<ncurses.h>
 
  /*-------------------------------------------------------------------*
  *    GLOBAL VARIABLES                                                *
@@ -70,19 +71,31 @@ void print_new_board(struct cell  board[I][J]);
 *    MAIN PROGRAM                                                      *
 **********************************************************************/
 void main(void) {
+	int row, col;
+	initscr();
 
 	struct cell board[I][J];
 	int stop = 0;
+	
+	
 
 	zero_the_boards(board);
 	first_board(board);
 	print_first_board(board);
+
+
 	
-	while (stop == 0) {
+	nodelay(stdscr, TRUE);
+	while (getch() == ERR) {
+		
+
 		check_rules_and_put_to_place(board);
 		print_new_board(board);
+		
 	}
-	getche();
+	
+	
+	endwin();
 }
 /*********************************************************************
 ;	F U N C T I O N    D E S C R I P T I O N
@@ -96,16 +109,29 @@ void main(void) {
 ;*********************************************************************/
 void print_new_board(struct cell  board[I][J])
 {
+	int row, col;
+
+
+	getmaxyx(stdscr, row, col);
+	int rowm = row / 2 - (I/2);
+	int colm = col / 2 - (J/2);
+	move(rowm, colm-2);
 	for (int i = 0; i < I; i++) {
+		move(rowm+i, colm-2);
 		for (int j = 0; j < J; j++) {
 			board[i][j].current = board[i][j].future;
-			printf("%d ", board[i][j].current);
+			printw("%d ", board[i][j].current);
+			
 		}
-		printf("\n");
-	}
 
+		printw("\n");
+	}
+	printw("\npress any key to stop...");
+
+
+	refresh();
 	Sleep(1000);
-	system("cls");
+	clear();
 }
 /*********************************************************************
 ;	F U N C T I O N    D E S C R I P T I O N
@@ -187,14 +213,24 @@ void check_rules_and_put_to_place(struct cell  board[I][J])
 ;*********************************************************************/
 void print_first_board(struct cell  board[I][J])
 {
+	int row, col;
+	getmaxyx(stdscr, row, col);
+	int rowm = row / 2 - (I / 2);
+	int colm = col / 2 - (J / 2);
+	move(rowm, colm - 2);
+	
 	for (int i = 0; i < I; i++) {/*tulostaa ekan siviilisaation*/
+		move(rowm + i, colm - 2);
 		for (int j = 0; j < J; j++) {
-			printf("%d ", board[i][j].current);
+			printw("%d ", board[i][j].current);
+			
 		}
-		printf("\n");
+		printw("\n");
 	}
+	refresh();
+
 	Sleep(1000);
-	system("cls");
+	clear();
 }
 
  /* end of main */
