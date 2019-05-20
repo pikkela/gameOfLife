@@ -48,8 +48,8 @@
 #define DEBUG
 
 /* Globaal constants */
-#define I 30
-#define J 30
+#define I 10
+#define J 10
 /* Globaal variables */
 
 /* Globaal structures */
@@ -62,109 +62,141 @@ struct cell
 *    FUNCTION PROTOTYPES                                             *
 *--------------------------------------------------------------------*/
 void zero_the_boards(struct cell board[I][J]);
+void first_board(struct cell  board[I][J]);
+void print_first_board(struct cell  board[I][J]);
+void check_rules_and_put_to_place(struct cell  board[I][J]);
+void print_new_board(struct cell  board[I][J]);
 /*********************************************************************
 *    MAIN PROGRAM                                                      *
 **********************************************************************/
 void main(void) {
 
 	struct cell board[I][J];
-	
+	int stop = 0;
+
 	zero_the_boards(board);
-	int ran;
-/****************************************************/
-	srand(time(0));			/*luodaan eka siviilisaatio*/
+	first_board(board);
+	print_first_board(board);
+	
+	while (stop == 0) {
+		check_rules_and_put_to_place(board);
+		print_new_board(board);
+	}
+	getche();
+}
+/*********************************************************************
+;	F U N C T I O N    D E S C R I P T I O N
+;---------------------------------------------------------------------
+; NAME:print_new_board()
+; DESCRIPTION: tulostaa uuden pelilaudan
+;	Input: struct cell board[][]
+;	Output:
+;  Used global variables:
+; REMARKS when using this function:
+;*********************************************************************/
+void print_new_board(struct cell  board[I][J])
+{
 	for (int i = 0; i < I; i++) {
 		for (int j = 0; j < J; j++) {
-			int ran = rand() % 15;
-			if (ran <= 8) {
-				board[i][j].current = 1;
+			board[i][j].current = board[i][j].future;
+			printf("%d ", board[i][j].current);
+		}
+		printf("\n");
+	}
+
+	Sleep(1000);
+	system("cls");
+}
+/*********************************************************************
+;	F U N C T I O N    D E S C R I P T I O N
+;---------------------------------------------------------------------
+; NAME:check_rules_and_put_to_place()
+; DESCRIPTION: tarkistaa solut ja laskee uusien paikat
+;	Input: struct cell board[][]
+;	Output:
+;  Used global variables:
+; REMARKS when using this function:
+;*********************************************************************/
+void check_rules_and_put_to_place(struct cell  board[I][J])
+{
+	int count = 0;
+	for (int i = 0; i < I; i++) {
+		for (int j = 0; j < J; j++) {
+
+			if (board[i][j].current == 1) {
+				if (j != J - 1) {
+					if (board[i][j + 1].current == 1) count++;
+				}
+				if (j != 0) {
+					if (board[i][j - 1].current == 1) count++;
+				}
+				if (i != 0) {
+					if (board[i - 1][j].current == 1) count++;
+					if (j != 0 && board[i - 1][j - 1].current == 1) count++;
+					if (j != J - 1 && board[i - 1][j + 1].current == 1) count++;
+				}
+				if (i != I - 1) {
+					if (board[i + 1][j].current == 1) count++;
+					if (j != 0 && board[i + 1][j - 1].current == 1) count++;
+					if (j != J - 1 && board[i + 1][j + 1].current == 1) count++;
+				}
+
+				if (count == 1 || count == 0 || count >= 4) {
+					board[i][j].future = 0;
+				}
+				if (count == 2 || count == 3) {
+					board[i][j].future = 1;
+				}
+				count = 0;
+			}
+			else if (board[i][j].current == 0) {
+				if (j != J - 1) {
+					if (board[i][j + 1].current == 1) count++;
+				}
+				if (j != 0) {
+					if (board[i][j - 1].current == 1) count++;
+				}
+				if (i != 0) {
+					if (board[i - 1][j].current == 1) count++;
+					if (j != 0 && board[i - 1][j - 1].current == 1) count++;
+					if (j != J - 1 && board[i - 1][j + 1].current == 1) count++;
+				}
+				if (i != I - 1) {
+					if (board[i + 1][j].current == 1) count++;
+					if (j != 0 && board[i + 1][j - 1].current == 1) count++;
+					if (j != J - 1 && board[i + 1][j + 1].current == 1) count++;
+				}
+
+				if (count == 3) {
+					board[i][j].future = 1;
+				}
+				count = 0;
 			}
 		}
-	}							/*p‰‰ttyy t‰h‰n*/
-	/******************************************/
+	}
+}
+/*********************************************************************
+;	F U N C T I O N    D E S C R I P T I O N
+;---------------------------------------------------------------------
+; NAME:print_first_board()
+; DESCRIPTION: tulostaa ensimm‰isen laudan
+;	Input: struct cell board[][]
+;	Output:
+;  Used global variables:
+; REMARKS when using this function:
+;*********************************************************************/
+void print_first_board(struct cell  board[I][J])
+{
 	for (int i = 0; i < I; i++) {/*tulostaa ekan siviilisaation*/
 		for (int j = 0; j < J; j++) {
 			printf("%d ", board[i][j].current);
 		}
 		printf("\n");
 	}
-
-	/*p‰‰ttyy t‰h‰n*/
-	/*******************************************/
-	int count = 0;
-	int stop = 0;
-	while (stop == 0) {
-		for (int i = 0; i < I; i++) {
-			for (int j = 0; j < J; j++) {
-
-				if (board[i][j].current == 1) {
-					if (j != J - 1) {
-						if (board[i][j + 1].current == 1) count++;
-					}
-					if (j != 0) {
-						if (board[i][j - 1].current == 1) count++;
-					}
-					if (i != 0) {
-						if (board[i - 1][j].current == 1) count++;
-						if (j != 0 && board[i - 1][j - 1].current == 1) count++;
-						if (j != J - 1 && board[i - 1][j + 1].current == 1) count++;
-					}
-					if (i != I - 1) {
-						if (board[i + 1][j].current == 1) count++;
-						if (j != 0 && board[i + 1][j - 1].current == 1) count++;
-						if (j != J - 1 && board[i + 1][j + 1].current == 1) count++;
-					}
-
-					if (count == 1 || count == 0 || count >= 4) {
-						board[i][j].future = 0;
-					}
-					if (count == 2 || count == 3) {
-						board[i][j].future = 1;
-					}
-					count = 0;
-				}
-				else if (board[i][j].current == 0) {
-					if (j != J - 1) {
-						if (board[i][j + 1].current == 1) count++;
-					}
-					if (j != 0) {
-						if (board[i][j - 1].current == 1) count++;
-					}
-					if (i != 0) {
-						if (board[i - 1][j].current == 1) count++;
-						if (j != 0 && board[i - 1][j - 1].current == 1) count++;
-						if (j != J - 1 && board[i - 1][j + 1].current == 1) count++;
-					}
-					if (i != I - 1) {
-						if (board[i + 1][j].current == 1) count++;
-						if (j != 0 && board[i + 1][j - 1].current == 1) count++;
-						if (j != J - 1 && board[i + 1][j + 1].current == 1) count++;
-					}
-
-					if (count == 3) {
-						board[i][j].future = 1;
-					}
-					count = 0;
-				}
-			}
-		}
-
-
-		printf("\n");
-		for (int i = 0; i < I; i++) {
-			for (int j = 0; j < J; j++) {
-				board[i][j].current = board[i][j].future;
-				printf("%d ", board[i][j].current);
-			}
-			printf("\n");
-		}
-
-		Sleep(1000);
-		system("cls");
-		getche();
-	}
-
+	Sleep(1000);
+	system("cls");
 }
+
  /* end of main */
 
 /*********************************************************************
@@ -183,11 +215,35 @@ void main(void) {
 
 void zero_the_boards(struct cell board[I][J])
 {
-	printf("jouuuuuu");
+
 	for (int i = 0; i < I; i++) {		/*nollaa current ja future*/
 		for (int j = 0; j < J; j++) {
 			board[i][j].current = 0;
 			board[i][j].future = 0;
+		}
+	}
+}
+/*********************************************************************
+;	F U N C T I O N    D E S C R I P T I O N
+;---------------------------------------------------------------------
+; NAME:first_board()
+; DESCRIPTION: luo ensimm‰isen pelilaudan
+;	Input: struct cell board[][]
+;	Output:
+;  Used global variables:
+; REMARKS when using this function:
+;*********************************************************************/
+void first_board(struct cell  board[I][J])
+{
+	int ran;
+
+	srand(time(0));			/*luodaan eka siviilisaatio*/
+	for (int i = 0; i < I; i++) {
+		for (int j = 0; j < J; j++) {
+			int ran = rand() % 15;
+			if (ran <= 8) {
+				board[i][j].current = 1;
+			}
 		}
 	}
 }
