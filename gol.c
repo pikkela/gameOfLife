@@ -49,8 +49,9 @@
 #define DEBUG
 
 /* Globaal constants */
-#define I 10
-#define J 10
+#define I 15
+#define J 15
+#define FILE_NAME "life.txt"
 /* Globaal variables */
 
 /* Globaal structures */
@@ -67,35 +68,89 @@ void first_board(struct cell  board[I][J]);
 void print_first_board(struct cell  board[I][J]);
 void check_rules_and_put_to_place(struct cell  board[I][J]);
 void print_new_board(struct cell  board[I][J]);
+void read_states(FILE * stream, struct cell  board[I][J]);
 /*********************************************************************
 *    MAIN PROGRAM                                                      *
 **********************************************************************/
 void main(void) {
+	struct cell board[I][J];
+	int start;
 	int row, col;
 	initscr();
+	printw("press 1 for new game.\npress 2 to load game.");
+	refresh();
+	scanf("%d", &start);
+	FILE *stream = fopen(FILE_NAME, "r");
 
-	struct cell board[I][J];
-	int stop = 0;
-	
-	
+	switch (start){
+		case 1:
+			zero_the_boards(board);
+			first_board(board);
+			break;
+		case 2:
+		
+			if (stream) {
 
-	zero_the_boards(board);
-	first_board(board);
+				read_states(stream, board);
+
+			}
+			else if (stream == NULL) {
+				printw("file not found starting a new game!!!");
+				refresh();
+					Sleep(1000);
+					zero_the_boards(board);
+					first_board(board);
+			}
+			break;
+		default:
+			break;
+	}
+
+	
 	print_first_board(board);
 
-
-	
 	nodelay(stdscr, TRUE);
 	while (getch() == ERR) {
 		
-
 		check_rules_and_put_to_place(board);
 		print_new_board(board);
 		
 	}
-	
-	
+
 	endwin();
+
+
+	FILE *file_ptr = fopen(FILE_NAME, "w");
+	for (int i = 0; i < I; i++) {			/*tulostaa siviilisaation tekstitiedostoon*/
+		for (int j = 0; j < J; j++) {
+			fprintf(file_ptr,"%d", board[i][j].current);
+		}
+	}
+	fclose(file_ptr);
+	
+} /* end of main */
+
+
+void read_states(FILE * stream, struct cell  board[I][J])
+{
+	char state;
+
+	for (int i = 0; i < J; i++) {
+		for (int j = 0; j < I; j++) {
+
+			state = fgetc(stream);
+
+			if (state == '1') {
+				board[i][j].current = 1;
+				board[i][j].future = 1;
+			}
+			else if (state == '0') {
+				board[i][j].current = 0;
+				board[i][j].future = 0;
+			}
+		}
+	}
+	fclose(stream);
 }
 /*********************************************************************
 ;	F U N C T I O N    D E S C R I P T I O N
@@ -115,13 +170,22 @@ void print_new_board(struct cell  board[I][J])
 	getmaxyx(stdscr, row, col);
 	int rowm = row / 2 - (I/2);
 	int colm = col / 2 - (J/2);
+
 	move(rowm, colm-2);
+
 	for (int i = 0; i < I; i++) {
+
 		move(rowm+i, colm-2);
+
 		for (int j = 0; j < J; j++) {
+
 			board[i][j].current = board[i][j].future;
-			printw("%d ", board[i][j].current);
-			
+			if (board[i][j].current == 0) {
+				printw(". ");
+			}
+			else {
+				printw("%d ", board[i][j].current);
+			}
 		}
 
 		printw("\n");
@@ -222,10 +286,15 @@ void print_first_board(struct cell  board[I][J])
 	for (int i = 0; i < I; i++) {/*tulostaa ekan siviilisaation*/
 		move(rowm + i, colm - 2);
 		for (int j = 0; j < J; j++) {
-			printw("%d ", board[i][j].current);
-			
+			if (board[i][j].current == 0) {
+				printw(". ");
+			}
+			else {
+				printw("%d ", board[i][j].current);
+			}
 		}
 		printw("\n");
+		
 	}
 	refresh();
 
@@ -233,7 +302,7 @@ void print_first_board(struct cell  board[I][J])
 	clear();
 }
 
- /* end of main */
+
 
 /*********************************************************************
 *    FUNCTIONS                                                     *
