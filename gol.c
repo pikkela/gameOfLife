@@ -69,43 +69,26 @@ void print_first_board(struct cell  board[I][J]);
 void check_rules_and_put_to_place(struct cell  board[I][J]);
 void print_new_board(struct cell  board[I][J]);
 void read_states(FILE * stream, struct cell  board[I][J]);
+void create_box();
+void start_game(struct cell  board[I][J]);
+void save_file(struct cell  board[I][J]);
 /*********************************************************************
 *    MAIN PROGRAM                                                      *
 **********************************************************************/
 void main(void) {
+
 	struct cell board[I][J];
-	int start;
+
 	int row, col;
+
 	initscr();
-	printw("press 1 for new game.\npress 2 to load game.");
+
+	/*WINDOW * win = newwin(I, J, 1, 20);
 	refresh();
-	scanf("%d", &start);
-	FILE *stream = fopen(FILE_NAME, "r");
-
-	switch (start){
-		case 1:
-			zero_the_boards(board);
-			first_board(board);
-			break;
-		case 2:
-		
-			if (stream) {
-
-				read_states(stream, board);
-
-			}
-			else if (stream == NULL) {
-				printw("file not found starting a new game!!!");
-				refresh();
-					Sleep(1000);
-					zero_the_boards(board);
-					first_board(board);
-			}
-			break;
-		default:
-			break;
-	}
-
+	box(win, 0, 0);
+	wrefresh(win);*/
+	
+	start_game(board);
 	
 	print_first_board(board);
 
@@ -119,17 +102,99 @@ void main(void) {
 
 	endwin();
 
+	/*tulostaa siviilisaation tekstitiedostoon*/
 
-	FILE *file_ptr = fopen(FILE_NAME, "w");
-	for (int i = 0; i < I; i++) {			/*tulostaa siviilisaation tekstitiedostoon*/
-		for (int j = 0; j < J; j++) {
-			fprintf(file_ptr,"%d", board[i][j].current);
-		}
-	}
-	fclose(file_ptr);
+	save_file(board);
 	
 } /* end of main */
 
+
+
+
+/*********************************************************************
+*    FUNCTIONS                                                     *
+**********************************************************************/
+
+/*********************************************************************
+;	F U N C T I O N    D E S C R I P T I O N
+;---------------------------------------------------------------------
+; NAME:save_file()
+; DESCRIPTION: tallentaa pelin
+;	Input: struct cell board[][]
+;	Output:
+;  Used global variables:
+; REMARKS when using this function:
+;*********************************************************************/
+void save_file(struct cell  board[I][J])
+{
+	FILE *file_ptr = fopen(FILE_NAME, "w");
+	for (int i = 0; i < I; i++) {
+		for (int j = 0; j < J; j++) {
+			fprintf(file_ptr, "%d", board[i][j].current);
+		}
+	}
+	fclose(file_ptr);
+}
+/*********************************************************************
+;	F U N C T I O N    D E S C R I P T I O N
+;---------------------------------------------------------------------
+; NAME:start_game()
+; DESCRIPTION: päävalikko
+;	Input: struct cell board[][]
+;	Output:
+;  Used global variables:
+; REMARKS when using this function:
+;*********************************************************************/
+void start_game(struct cell  board[I][J])
+{
+
+	WINDOW * win = newwin(4, 27, 1, 20);
+	refresh();
+	box(win, '*', '*');
+
+	int start;
+	mvwprintw(win, 1, 1, "  press 1 for new game.");
+	mvwprintw(win, 2, 1, "  press 2 to load game.");
+	wrefresh(win);
+	refresh();
+	scanf("%d", &start);
+	FILE *stream = fopen(FILE_NAME, "r");
+
+	switch (start) {
+	case 1:
+		zero_the_boards(board);
+		first_board(board);
+		break;
+	case 2:
+
+		if (stream) {
+
+			read_states(stream, board);
+
+		}
+		else if (stream == NULL) {
+			mvwprintw(win, 1, 1, " file not found starting a new game!!!");
+			wrefresh(win);
+			Sleep(5000);
+			zero_the_boards(board);
+			first_board(board);
+		}
+		break;
+	default:
+		break;
+	}
+}
+
+/*********************************************************************
+;	F U N C T I O N    D E S C R I P T I O N
+;---------------------------------------------------------------------
+; NAME:read_states()
+; DESCRIPTION: lataa vanhan pelin
+;	Input:stream, struct cell board[][]
+;	Output:
+;  Used global variables:
+; REMARKS when using this function:
+;*********************************************************************/
 
 void read_states(FILE * stream, struct cell  board[I][J])
 {
@@ -165,17 +230,20 @@ void read_states(FILE * stream, struct cell  board[I][J])
 void print_new_board(struct cell  board[I][J])
 {
 	int row, col;
+	WINDOW * win = newwin(4, 27, 1, 1);
+	refresh();
+	box(win, '*', '*');
 
 
 	getmaxyx(stdscr, row, col);
-	int rowm = row / 2 - (I/2);
-	int colm = col / 2 - (J/2);
+	int rowm = row / 2 - (I / 2);
+	int colm = col / 2 - (J / 2);
 
-	move(rowm, colm-2);
+	move(rowm, colm - 2);
 
 	for (int i = 0; i < I; i++) {
 
-		move(rowm+i, colm-2);
+		move(rowm + i, colm - 2);
 
 		for (int j = 0; j < J; j++) {
 
@@ -190,9 +258,10 @@ void print_new_board(struct cell  board[I][J])
 
 		printw("\n");
 	}
-	printw("\npress any key to stop...");
+	mvwprintw(win, 1, 1, "press any key to stop...");
 
 
+	wrefresh(win);
 	refresh();
 	Sleep(1000);
 	clear();
@@ -282,7 +351,7 @@ void print_first_board(struct cell  board[I][J])
 	int rowm = row / 2 - (I / 2);
 	int colm = col / 2 - (J / 2);
 	move(rowm, colm - 2);
-	
+
 	for (int i = 0; i < I; i++) {/*tulostaa ekan siviilisaation*/
 		move(rowm + i, colm - 2);
 		for (int j = 0; j < J; j++) {
@@ -294,19 +363,13 @@ void print_first_board(struct cell  board[I][J])
 			}
 		}
 		printw("\n");
-		
+
 	}
 	refresh();
 
 	Sleep(1000);
 	clear();
 }
-
-
-
-/*********************************************************************
-*    FUNCTIONS                                                     *
-**********************************************************************/
 /*********************************************************************
 ;	F U N C T I O N    D E S C R I P T I O N
 ;---------------------------------------------------------------------
