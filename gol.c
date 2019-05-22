@@ -49,8 +49,8 @@
 #define DEBUG
 
 /* Globaal constants */
-#define I 15
-#define J 15
+#define I 30
+#define J 30
 #define FILE_NAME "life.txt"
 /* Globaal variables */
 
@@ -209,6 +209,10 @@ void read_states(FILE * stream, struct cell  board[I][J])
 				board[i][j].current = 1;
 				board[i][j].future = 1;
 			}
+			if (state == '2') {
+				board[i][j].current = 2;
+				board[i][j].future = 2;
+			}
 			else if (state == '0') {
 				board[i][j].current = 0;
 				board[i][j].future = 0;
@@ -276,63 +280,166 @@ void print_new_board(struct cell  board[I][J])
 ;  Used global variables:
 ; REMARKS when using this function:
 ;*********************************************************************/
+
+/*vertailee populaatio ykkösen*/
 void check_rules_and_put_to_place(struct cell  board[I][J])
 {
 	int count = 0;
+	int count2 = 0;
 	for (int i = 0; i < I; i++) {
 		for (int j = 0; j < J; j++) {
 
-			if (board[i][j].current == 1) {
+			if (board[i][j].current == 1|| board[i][j].current == 2) {
 				if (j != J - 1) {
 					if (board[i][j + 1].current == 1) count++;
+					else if (board[i][j + 1].current == 2) count2++;
 				}
 				if (j != 0) {
 					if (board[i][j - 1].current == 1) count++;
+					else if (board[i][j - 1].current == 2) count2++;
 				}
 				if (i != 0) {
 					if (board[i - 1][j].current == 1) count++;
+					else if (board[i - 1][j].current == 2) count2++;
+
 					if (j != 0 && board[i - 1][j - 1].current == 1) count++;
+					else if (j != 0 && board[i - 1][j - 1].current == 2) count2++;
+
 					if (j != J - 1 && board[i - 1][j + 1].current == 1) count++;
+					else if (j != J - 1 && board[i - 1][j + 1].current == 2) count2++;
 				}
 				if (i != I - 1) {
 					if (board[i + 1][j].current == 1) count++;
+					else if (board[i + 1][j].current == 2) count2++;
+
 					if (j != 0 && board[i + 1][j - 1].current == 1) count++;
+					else if (j != 0 && board[i + 1][j - 1].current == 2) count2++;
+
 					if (j != J - 1 && board[i + 1][j + 1].current == 1) count++;
+					else if (j != J - 1 && board[i + 1][j + 1].current == 2) count2++;
+				}
+				if (board[i][j].current == 1) {
+					if (count == 1 || count == 0 || count >= 4) {
+						board[i][j].future = 0;
+					}
+					if (count == 2 || count == 3) {
+						board[i][j].future = 1;
+					}
+					if (count2 > count) {
+						board[i][j].future = 2;
+					}
+				}
+				if (board[i][j].current == 2) {
+					if (count2 == 1 || count2 == 0 || count2 >= 4) {
+						board[i][j].future = 0;
+					}
+					if (count2 == 2 || count2 == 3) {
+						board[i][j].future = 2;
+					}
+					if (count > count2) {
+						board[i][j].future = 1;
+					}
+				}
+				count = 0;
+				count2 = 0;
+			}
+			else if (board[i][j].current == 0) {
+				if (j != J - 1) {
+					if (board[i][j + 1].current == 1) count++;
+					else if (board[i][j + 1].current == 2) count2++;
+				}
+				if (j != 0) {
+					if (board[i][j - 1].current == 1) count++;
+					else if (board[i][j - 1].current == 2) count2++;
+				}
+				if (i != 0) {
+					if (board[i - 1][j].current == 1) count++;
+					else if (board[i - 1][j].current == 2) count2++;
+
+					if (j != 0 && board[i - 1][j - 1].current == 1) count++;
+					else if (j != 0 && board[i - 1][j - 1].current == 2) count2++;
+
+					if (j != J - 1 && board[i - 1][j + 1].current == 1) count++;
+					else if (j != J - 1 && board[i - 1][j + 1].current == 2) count2++;
+				}
+				if (i != I - 1) {
+					if (board[i + 1][j].current == 1) count++;
+					else if (board[i + 1][j].current == 2) count2++;
+
+					if (j != 0 && board[i + 1][j - 1].current == 1) count++;
+					else if (j != 0 && board[i + 1][j - 1].current == 2) count2++;
+
+					if (j != J - 1 && board[i + 1][j + 1].current == 1) count++;
+					else if (j != J - 1 && board[i + 1][j + 1].current == 2) count2++;
+				}
+
+				if (count == 3) {
+					board[i][j].future = 1;
+				}
+				else if (count2 == 3) {
+					board[i][j].future = 2;
+				}
+				count = 0;
+				count2 = 0;
+			}
+		}
+	}
+	/********************************************/
+	/*vertailee populaatio kakkosen*/
+/*	for (int i = 0; i < I; i++) {
+		for (int j = 0; j < J; j++) {
+
+			if (board[i][j].current == 2) {
+				if (j != J - 1) {
+					if (board[i][j + 1].current == 2) count++;
+				}
+				if (j != 0) {
+					if (board[i][j - 1].current == 2) count++;
+				}
+				if (i != 0) {
+					if (board[i - 1][j].current == 2) count++;
+					if (j != 0 && board[i - 1][j - 1].current == 2) count++;
+					if (j != J - 1 && board[i - 1][j + 1].current == 2) count++;
+				}
+				if (i != I - 1) {
+					if (board[i + 1][j].current == 2) count++;
+					if (j != 0 && board[i + 1][j - 1].current == 2) count++;
+					if (j != J - 1 && board[i + 1][j + 1].current == 2) count++;
 				}
 
 				if (count == 1 || count == 0 || count >= 4) {
 					board[i][j].future = 0;
 				}
 				if (count == 2 || count == 3) {
-					board[i][j].future = 1;
+					board[i][j].future = 2;
 				}
 				count = 0;
 			}
 			else if (board[i][j].current == 0) {
 				if (j != J - 1) {
-					if (board[i][j + 1].current == 1) count++;
+					if (board[i][j + 1].current == 2) count++;
 				}
 				if (j != 0) {
-					if (board[i][j - 1].current == 1) count++;
+					if (board[i][j - 1].current == 2) count++;
 				}
 				if (i != 0) {
-					if (board[i - 1][j].current == 1) count++;
-					if (j != 0 && board[i - 1][j - 1].current == 1) count++;
-					if (j != J - 1 && board[i - 1][j + 1].current == 1) count++;
+					if (board[i - 1][j].current == 2) count++;
+					if (j != 0 && board[i - 1][j - 1].current == 2) count++;
+					if (j != J - 1 && board[i - 1][j + 1].current == 2) count++;
 				}
 				if (i != I - 1) {
-					if (board[i + 1][j].current == 1) count++;
-					if (j != 0 && board[i + 1][j - 1].current == 1) count++;
-					if (j != J - 1 && board[i + 1][j + 1].current == 1) count++;
+					if (board[i + 1][j].current == 2) count++;
+					if (j != 0 && board[i + 1][j - 1].current == 2) count++;
+					if (j != J - 1 && board[i + 1][j + 1].current == 2) count++;
 				}
 
 				if (count == 3) {
-					board[i][j].future = 1;
+					board[i][j].future = 2;
 				}
 				count = 0;
 			}
 		}
-	}
+	}*/
 }
 /*********************************************************************
 ;	F U N C T I O N    D E S C R I P T I O N
@@ -404,13 +511,24 @@ void zero_the_boards(struct cell board[I][J])
 void first_board(struct cell  board[I][J])
 {
 	int ran;
-
+	int first = J / 2;
 	srand(time(0));			/*luodaan eka siviilisaatio*/
 	for (int i = 0; i < I; i++) {
 		for (int j = 0; j < J; j++) {
 			int ran = rand() % 15;
-			if (ran <= 8) {
-				board[i][j].current = 1;
+			if (ran <= 8 && j <= first) {
+				if (j > first-3) {
+					board[i][j - 3].current = 1;
+				}
+				else { board[i][j].current = 1; }
+			}
+			if (ran <= 8 && j >= first) {
+				if (j < first+3) {
+					board[i][j + 3].current = 2;
+				}
+				else { 
+					board[i][j].current = 2; 
+				}
 			}
 		}
 	}
